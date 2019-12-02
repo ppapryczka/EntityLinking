@@ -1,14 +1,14 @@
-from wikidata.client import Client
+from wikidata.client import Client, EntityId
 
 from typing import List, Dict, Any
 import requests
-import pywikibot
 
-ID_INSTANCE_OF = "P31"
-WIKIDATA_URL = 'https://query.wikidata.org/sparql'
-DEFAULT_RESULTS_LIMIT = 2
+ID_INSTANCE_OF: str = "P31"
+WIKIDATA_URL:str = 'https://query.wikidata.org/sparql'
+DEFAULT_RESULTS_LIMIT: int = 2
 
-def get_data_for_given_entity(entity: str) -> Dict[str, Any]:
+
+def get_data_for_given_entity(entity: EntityId) -> Dict[str, Any]:
     # load data
     client = Client()
     entity = client.get(entity, load=True)
@@ -30,14 +30,11 @@ def get_data_for_given_entity(entity: str) -> Dict[str, Any]:
         "instance of": instance_of
     }
 
-def get_results_for_given_token(token: str) -> Any:
 
+def get_instance_of_for_entity(entity: EntityId) -> List:
+    data = get_data_for_given_entity(entity)
+    return data["instance of"]
 
-    site = pywikibot.Site("pl", "wikipedia")
-    page = pywikibot.Page(site, token)
-    item = pywikibot.ItemPage.fromPage(page)
-
-    print(item)
 
 def get_pages_ids_for_given_token(token: str) -> List[str]:
     # crete request for given token, ref:
@@ -63,6 +60,8 @@ def get_pages_ids_for_given_token(token: str) -> List[str]:
 
     return entities
 
+
 if __name__=="__main__":
+    print(get_instance_of_for_entity("Q231593"))
     print(get_pages_ids_for_given_token("Nowy Targ"))
 
