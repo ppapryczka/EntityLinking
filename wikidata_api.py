@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 import requests
 
 ID_INSTANCE_OF: str = "P31"
+ID_SUBCLASS_OF: str = "P279"
 WIKIDATA_URL:str = 'https://query.wikidata.org/sparql'
 DEFAULT_RESULTS_LIMIT: int = 2
 
@@ -16,12 +17,34 @@ def get_data_for_given_entity(entity: EntityId) -> Dict[str, Any]:
 
     # get only important data - title, lables, descriptions and instance of
     title = entity_data["title"]
-    labels = [entity_data["labels"]["pl"], entity_data["labels"]["en"]]
-    descriptions = [entity_data['descriptions']["pl"], entity_data['descriptions']["en"]]
+
+    labels = []
+    if "lables" in entity_data:
+        if "pl" in entity_data["lables"]:
+            labels.append(entity_data["labels"]["pl"])
+
+        if "en" in entity_data["lables"]:
+            labels.append(entity_data["labels"]["en"])
+
+    descriptions = []
+    if "descriptions" in entity_data:
+        if "pl" in entity_data["descriptions"]:
+            descriptions.append(entity_data["labels"]["pl"])
+
+        if "en" in entity_data["descriptions"]:
+            descriptions.append(entity_data["labels"]["en"])
 
     instance_of = []
-    for _, obj in enumerate(entity_data["claims"][ID_INSTANCE_OF]):
-        instance_of.append(obj["mainsnak"]["datavalue"]["value"]["id"])
+    # take instance of entities
+    if "claims" in entity_data:
+        if ID_INSTANCE_OF in entity_data["claims"]:
+            for _, obj in enumerate(entity_data["claims"][ID_INSTANCE_OF]):
+                instance_of.append(obj["mainsnak"]["datavalue"]["value"]["id"])
+
+        # take subclass of entities
+        if ID_SUBCLASS_OF in entity_data["claims"]:
+            for _, obj in enumerate(entity_data["claims"][ID_SUBCLASS_OF]):
+                instance_of.append(obj["mainsnak"]["datavalue"]["value"]["id"])
 
     return {
         "title": title,
