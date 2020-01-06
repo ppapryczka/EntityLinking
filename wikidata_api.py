@@ -92,7 +92,7 @@ def get_instance_of_for_entity(entity: EntityId) -> List:
         entity: Name of entity, in format Q{Number}.
 
     Returns:
-       List of "instance of" entries.
+       List of "instance of" and "subclass of" for entity.
     """
     data = get_data_for_given_entity(entity)
     return data["instance of"]
