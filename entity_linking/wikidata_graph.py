@@ -1,4 +1,4 @@
-from wikidata_api import get_instance_of_for_entity
+from entity_linking.wikidata_api import get_instance_of_for_entity
 from wikidata.entity import EntityId
 
 '''
