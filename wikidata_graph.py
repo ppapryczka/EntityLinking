@@ -10,6 +10,7 @@ import networkx as nx
 
 MAX_DEPTH_LEVEL = 3
 
+
 def create_graph_for_entity(entity: EntityId) -> nx.Graph():
     """
     Create directed graph for given ``entity``. Nodes are entity names.

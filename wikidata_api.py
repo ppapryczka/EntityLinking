@@ -14,6 +14,64 @@ WIKIDATA_URL_SPARQL: str = 'https://query.wikidata.org/sparql'
 # default max results
 DEFAULT_RESULTS_LIMIT: int = 2
 
+# target entities
+TARGET_ENTITIES: List[str] = [
+    # human
+    "Q5",
+    # geographic location
+    "Q2221906",
+    # academic discipline
+    "Q11862829",
+    # anatomical structure
+    "Q4936952",
+    # occupation
+    "Q12737077",
+    # vehicle model
+    "Q29048322",
+    # construction
+    "Q811430",
+    # written work
+    "Q47461344",
+    # astronomical object
+    "Q6999",
+    # clothing
+    "Q11460",
+    # taxon
+    "Q16521",
+    # mythical entity
+    "Q24334685",
+    # type of sport
+    "Q31629",
+    # supernatural being
+    "Q28855038",
+    # liquid
+    "Q11435",
+    # political system
+    "Q28108",
+    # group of living things
+    "Q16334298",
+    # chemical entity
+    "Q43460564",
+    # publication
+    "Q732577",
+    # landform
+    "Q271669",
+    # language
+    "Q34770",
+    # unit
+    "Q2198779",
+    # physico-geographical object
+    "Q20719696",
+    # intellectual work
+    "Q15621286",
+    # tool
+    "Q39546",
+    # organism
+    "Q7239",
+    # food
+    "Q2095"
+]
+
 
 def get_wikidata_link_for_entity(entity: str) -> str:
     """
