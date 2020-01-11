@@ -1,14 +1,15 @@
+import networkx as nx
+from entity_linking.utils import TARGET_ENTITIES
 from entity_linking.wikidata_api import get_instance_of_for_entity
 from wikidata.entity import EntityId
 
-'''
+"""
 DRAW GRAPH
 import matplotlib.pyplot as plt
-'''
+"""
 
-import networkx as nx
 
-MAX_DEPTH_LEVEL = 3
+MAX_DEPTH_LEVEL = 5
 
 
 def create_graph_for_entity(entity: EntityId) -> nx.Graph():
@@ -39,16 +40,18 @@ def create_graph_for_entity(entity: EntityId) -> nx.Graph():
 
         this_level_entities = next_level_entities
 
-    '''
+    """
     DRAW GRAPH
     nx.draw_kamada_kawai(g, with_labels=True, font_weight='bold', )
     plt.show()
-    '''
+    """
     return g
 
 
-if __name__ == "__main__":
-    import datetime
-    now = datetime.datetime.now()
-    create_graph_for_entity(EntityId("Q231593"))
-    print(datetime.datetime.now() - now)
+def check_if_target_entity_is_in_graph(g: nx.Graph) -> bool:
+    for target_e in TARGET_ENTITIES:
+        if target_e in g.nodes():
+            return True
+
+    return False
+
