@@ -51,25 +51,31 @@ def get_data_for_given_entity(entity: EntityId) -> Dict[str, Any]:
     # get only important data - title, labels, descriptions and instance of
     title = entity_data["title"]
     labels = []
-    if "lables" in entity_data:
-        if "pl" in entity_data["lables"]:
-            labels.append(entity_data["labels"]["pl"])
+    if "labels" in entity_data:
+        # if Polish label is not define - return empty value!
+        if "pl" in entity_data["labels"]:
+            labels.append(entity_data["labels"]["pl"]["value"])
         else:
             return {"title": [], "labels": [], "descriptions": [], "instance of": []}
 
-        if "en" in entity_data["lables"]:
-            labels.append(entity_data["labels"]["en"])
+        if "en" in entity_data["labels"]:
+            labels.append(entity_data["labels"]["en"]["value"])
+        else:
+            labels.append("")
 
     descriptions = []
     if "descriptions" in entity_data:
+        # it doesn't matter if Polish description is not defined
         if "pl" in entity_data["descriptions"]:
-            descriptions.append(entity_data["descriptions"]["pl"])
+            descriptions.append(entity_data["descriptions"]["pl"]["value"])
         else:
-
-            return {"title": [], "labels": [], "descriptions": [], "instance of": []}
+            descriptions.append("")
 
         if "en" in entity_data["descriptions"]:
-            descriptions.append(entity_data["descriptions"]["en"])
+            descriptions.append(entity_data["descriptions"]["en"]["value"])
+        else:
+
+            descriptions.append("")
 
     instance_of = []
     if "claims" in entity_data:
@@ -120,6 +126,8 @@ def get_pages_ids_for_given_token(token: str) -> List[str]:
     Returns:
         List of results as a entities IDs.
     """
+
+    # omit tokens with '\' sign - that tokens cause wikidata error
     for w in token.split():
         if w == "\\":
             return []
@@ -146,8 +154,10 @@ def get_pages_ids_for_given_token(token: str) -> List[str]:
         WIKIDATA_URL_SPARQL, headers=headers, params={"format": "json", "query": q}
     )
 
+    # parse json
     data = r.json()
 
+    # take entities
     entities = []
     for x in data["results"]["bindings"]:
         entities.append(x["item"]["value"].split("/")[-1])

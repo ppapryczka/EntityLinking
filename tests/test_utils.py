@@ -1,0 +1,6 @@
+# test entity 1 - "Nowy Targ"
+TEST_ENTITY_1: str = "Q231593"
+# test entity 2 - "The Blues Brothers"
+TEST_ENTITY_2: str = "Q1344949"
+# test entity 3 - "Krzysztof Krawczyk"
+TEST_ENTITY_3: str = "Q1380592"

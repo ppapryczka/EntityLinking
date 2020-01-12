@@ -6,6 +6,7 @@ import networkx as nx
 from entity_linking.load_test_data import (
     load_entity_sequence_list_from_test_file_1,
     load_entity_sequence_list_from_test_file_2)
+
 from entity_linking.tokenizer import (simple_tokenize_for_entity_sequence,
                                       tokenize_using_wikidata_result)
 from entity_linking.utils import EntitySequence, ExtendedToken
@@ -33,7 +34,7 @@ def simple_entity_graph_classifier_for_extended_tokens(
 def run_simple_graph_classifier_for_entities():
     seq_number: int = 5
 
-    sequences: List[EntitySequence] = load_entity_sequence_list_from_test_file_1(
+    sequences: List[EntitySequence] = load_entity_sequence_list_from_test_file_2(
         seq_number
     )
 
