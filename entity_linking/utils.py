@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List
+import pandas as pd
 
 # test file 1 name, ATTENTION! it is too big to read full
 TEST_FILE_1: str = "../tokens-with-entities.tsv"
@@ -64,6 +65,22 @@ TARGET_ENTITIES: List[str] = [
     # food
     "Q2095",
 ]
+# Punctuation signs to omit
+PUNCTUATION_SIGNS: List[str] = [
+    ";",
+    ",",
+    ":",
+    "-",
+    ".",
+    "!",
+    "?",
+    "(",
+    ")",
+    "-",
+    "...",
+    '"',
+    "–",
+]
 
 
 @dataclass
@@ -81,18 +98,6 @@ class ExtendedEntityWord(EntityWord):
 
 
 @dataclass
-class EntitySequence:
-    sequence: List[EntityWord]
-
-    def get_token_as_str(self, start: int, end: int) -> str:
-        result = ""
-        for i in range(start, end):
-            result += " " + self.sequence[i].token
-
-        return result
-
-
-@dataclass
 class Token:
     start: int
     end: int
@@ -101,3 +106,78 @@ class Token:
 @dataclass
 class ExtendedToken(Token):
     pages: List[str]
+
+
+@dataclass
+class EntitySequence:
+    sequence: List[EntityWord]
+
+    def get_token_as_str(self, start: int, end: int) -> str:
+        result = ""
+        for i in range(start, end):
+            result += self.sequence[i].token + " "
+
+        return result[:-1]
+
+    def create_result_table(
+        self, tokens: List[Token], results: List[str]
+    ) -> pd.DataFrame:
+        result_df = pd.DataFrame(columns=["original", "prediction"],)
+
+        assert len(tokens) == len(results)
+
+        if len(tokens) > 0:
+            cur_index: int = 0
+
+            for t_idx, t in enumerate(tokens):
+                while cur_index < t.start:
+                    ground_truth = self.sequence[cur_index].entity_id != "_"
+                    if ground_truth:
+                        ground_truth = 1
+                    else:
+                        ground_truth = 0
+
+                    result_df = result_df.append(
+                        pd.DataFrame(
+                            [[ground_truth, 0]], columns=["original", "prediction"]
+                        )
+                    )
+                    cur_index = cur_index + 1
+
+                while cur_index < t.end:
+                    ground_truth = self.sequence[cur_index].entity_id != "_"
+                    if ground_truth:
+                        ground_truth = 1
+                    else:
+                        ground_truth = 0
+
+                    prediction = results[t_idx] != "_"
+                    if prediction:
+                        prediction = 1
+                    else:
+                        prediction = 0
+
+                    result_df = result_df.append(
+                        pd.DataFrame(
+                            [[ground_truth, prediction]],
+                            columns=["original", "prediction"],
+                        )
+                    )
+                    cur_index = cur_index + 1
+
+            while cur_index < len(self.sequence):
+                ground_truth = self.sequence[cur_index].entity_id != "_"
+
+                if ground_truth:
+                    ground_truth = 1
+                else:
+                    ground_truth = 0
+
+                result_df = result_df.append(
+                    pd.DataFrame(
+                        [[ground_truth, 0]], columns=["original", "prediction"]
+                    )
+                )
+                cur_index = cur_index + 1
+
+        return result_df

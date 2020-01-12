@@ -8,6 +8,9 @@ from wikidata.client import Client, EntityId
 ID_INSTANCE_OF: str = "P31"
 # ID of "subclass of" property
 ID_SUBCLASS_OF: str = "P279"
+# ID of facet of
+ID_FACET_OF: str = "P1269"
+
 # address of wikidata
 WIKIDATA_URL: str = "https://www.wikidata.org/wiki/"
 # address of wikidata sparql API
@@ -52,11 +55,11 @@ def get_data_for_given_entity(entity: EntityId) -> Dict[str, Any]:
     title = entity_data["title"]
     labels = []
     if "labels" in entity_data:
-        # if Polish label is not define - return empty value!
+        # it doesn't matter if Polish description is not defined
         if "pl" in entity_data["labels"]:
             labels.append(entity_data["labels"]["pl"]["value"])
         else:
-            return {"title": [], "labels": [], "descriptions": [], "instance of": []}
+            labels.append("")
 
         if "en" in entity_data["labels"]:
             labels.append(entity_data["labels"]["en"]["value"])
@@ -89,6 +92,13 @@ def get_data_for_given_entity(entity: EntityId) -> Dict[str, Any]:
         # take subclass of entity
         if ID_SUBCLASS_OF in entity_data["claims"]:
             for _, obj in enumerate(entity_data["claims"][ID_SUBCLASS_OF]):
+                mainsnak = obj["mainsnak"]
+                if mainsnak["snaktype"] != "novalue":
+                    instance_of.append(mainsnak["datavalue"]["value"]["id"])
+
+        # take facet of
+        if ID_FACET_OF in entity_data["claims"]:
+            for _, obj in enumerate(entity_data["claims"][ID_FACET_OF]):
                 mainsnak = obj["mainsnak"]
                 if mainsnak["snaktype"] != "novalue":
                     instance_of.append(mainsnak["datavalue"]["value"]["id"])

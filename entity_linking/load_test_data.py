@@ -1,12 +1,18 @@
 import csv
 from typing import List
 
-from entity_linking.utils import (TEST_FILE_1, TEST_FILE_2, EntitySequence,
-                                  EntityWord, ExtendedEntityWord)
+from entity_linking.utils import (
+    TEST_FILE_1,
+    TEST_FILE_2,
+    EntitySequence,
+    EntityWord,
+    ExtendedEntityWord,
+    PUNCTUATION_SIGNS,
+)
 
 
 def load_entity_sequence_list_from_test_file_1(
-    sequences_number: int
+    sequences_number: int,
 ) -> List[EntitySequence]:
     # take only first sequences_number sequences
     result: List[EntitySequence] = []
@@ -22,15 +28,16 @@ def load_entity_sequence_list_from_test_file_1(
                     break
                 es = EntitySequence([])
             else:
-                es.sequence.append(
-                    EntityWord(cur_row[1], cur_row[2], cur_row[3], cur_row[4])
-                )
+                if cur_row[1] not in PUNCTUATION_SIGNS:
+                    es.sequence.append(
+                        EntityWord(cur_row[1], cur_row[2], cur_row[3], cur_row[4])
+                    )
 
     return result
 
 
 def load_entity_sequence_list_from_test_file_2(
-    sequences_number: int
+    sequences_number: int,
 ) -> List[ExtendedEntityWord]:
     # take only first sequences_number sequences
     result: List[ExtendedEntityWord] = []
@@ -47,16 +54,17 @@ def load_entity_sequence_list_from_test_file_2(
                 es = EntitySequence([])
             # row is not empty - append EntityWord
             else:
-                es.sequence.append(
-                    ExtendedEntityWord(
-                        cur_row[1],
-                        cur_row[3],
-                        cur_row[5],
-                        cur_row[6],
-                        cur_row[2],
-                        cur_row[4],
+                if cur_row[1] not in PUNCTUATION_SIGNS:
+                    es.sequence.append(
+                        ExtendedEntityWord(
+                            cur_row[1],
+                            cur_row[3],
+                            cur_row[5],
+                            cur_row[6],
+                            cur_row[2],
+                            cur_row[4],
+                        )
                     )
-                )
 
     return result
 

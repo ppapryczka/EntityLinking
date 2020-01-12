@@ -51,7 +51,16 @@ def create_graph_for_entity(entity: EntityId, graph_levels: int = MAX_DEPTH_LEVE
 
 
 def check_if_target_entity_is_in_graph(g: nx.Graph) -> bool:
-    nodes: List = list(g.nodes())
+    """
+    Check if any of target entities.
+
+    Args:
+        g: Entity graph.
+
+    Returns:
+
+    """
+    nodes: List = list(g.nodes)
     for target_e in TARGET_ENTITIES:
         if target_e in nodes:
             return True
