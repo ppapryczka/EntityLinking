@@ -16,10 +16,10 @@ jobs:
         # An explicit key for restoring and saving the cache
         key: cache-entity-linking
     - uses: actions/checkout@v1
-    - name: Set up Python 3.6
+    - name: Set up Python 3.8
       uses: actions/setup-python@v1
       with:
-        python-version: 3.6
+        python-version: 3.8
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
