@@ -17,9 +17,9 @@ from entity_linking.tokenizer import (
 )
 from entity_linking.utils import (
     NOT_WIKIDATA_ENTITY_SIGN,
-    EntitySequence,
-    ExtendedToken,
-    Token,
+    TokensSequence,
+    TokensGroup,
+    ExtendedTokensGroup,
 )
 from entity_linking.wikidata_graph import (
     check_if_target_entity_is_in_graph,
@@ -28,7 +28,7 @@ from entity_linking.wikidata_graph import (
 
 
 def simple_entity_graph_classifier_for_extended_tokens(
-    tokens: List[ExtendedToken],
+    tokens: List[ExtendedTokensGroup],
 ) -> List[EntityId]:
     tokens_result_entities: List[EntityId] = []
     for t in tokens:
@@ -43,8 +43,8 @@ def simple_entity_graph_classifier_for_extended_tokens(
     return tokens_result_entities
 
 
-def simple_classifier_for_sequence(sequence: EntitySequence) -> pd.DataFrame():
-    chosen_tokens: List[ExtendedToken] = tokenize_using_wikidata_result(2, sequence)
+def simple_classifier_for_sequence(sequence: TokensSequence) -> pd.DataFrame():
+    chosen_tokens: List[ExtendedTokensGroup] = tokenize_using_wikidata_result(2, sequence)
 
     token_results = []
     for token in chosen_tokens:
@@ -63,7 +63,7 @@ def simple_classifier_for_sequence(sequence: EntitySequence) -> pd.DataFrame():
 
 
 def run_classifier_for_sequences(seq_number: int):
-    sequences: List[EntitySequence] = load_entity_sequence_list_from_test_file_2(
+    sequences: List[TokensSequence] = load_entity_sequence_list_from_test_file_2(
         seq_number
     )
 
@@ -92,7 +92,7 @@ def run_classifier_for_sequences(seq_number: int):
 def run_simple_graph_classifier_for_sequences(seq_number: int):
     seq_number: int = 100
 
-    sequences: List[EntitySequence] = load_entity_sequence_list_from_test_file_2(
+    sequences: List[TokensSequence] = load_entity_sequence_list_from_test_file_2(
         seq_number
     )
 

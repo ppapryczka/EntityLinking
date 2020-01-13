@@ -91,44 +91,44 @@ DISAMBIGATION_PAGE: EntityId = EntityId("Q4167410")
 
 
 @dataclass
-class EntityWord:
-    token: str
+class Token:
+    token_value: str
     preceding_token: int
     link_title: str
     entity_id: str
 
 
 @dataclass
-class ExtendedEntityWord(EntityWord):
+class ExtendedToken(Token):
     lemma: str
     morph_tags: str
 
 
 @dataclass
-class Token:
+class TokensGroup:
     start: int
     end: int
 
 
 @dataclass
-class ExtendedToken(Token):
+class ExtendedTokensGroup(TokensGroup):
     pages: List[str]
 
 
 @dataclass
-class EntitySequence:
-    sequence: List[EntityWord]
+class TokensSequence:
+    sequence: List[Token]
     id: int
 
     def get_token_as_str(self, start: int, end: int) -> str:
         result = ""
         for i in range(start, end):
-            result += self.sequence[i].token + " "
+            result += self.sequence[i].token_value + " "
 
         return result[:-1]
 
     def create_result_table(
-        self, tokens: List[Token], results: List[str]
+        self, tokens: List[TokensGroup], results: List[str]
     ) -> pd.DataFrame:
         result_df = pd.DataFrame(columns=["original", "prediction"],)
 
