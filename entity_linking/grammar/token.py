@@ -10,9 +10,9 @@ class Token():
         self.add_analysis(analysis=analysis)
 
     def __eq__(self, other):
-        return self.get_range() == other.get_range() and \
-            self.get_word() == other.get_word() and \
-            self.get_analyses() == other.get_analyses()
+        return self.range == other.range and \
+            self.word == other.word and \
+            self.analyses == other.analyses
 
     def __ne__(self, other):
         return not self == other
@@ -24,13 +24,16 @@ class Token():
 
         return Token(start=start, end=end, analysis=analysis)
 
-    def get_range(self) -> Range:
+    @property
+    def range(self):
         return self._range
 
-    def get_analyses(self):
+    @property
+    def analyses(self):
         return self._analyses
 
-    def get_word(self) -> str:
+    @property
+    def word(self) -> str:
         return self._word
 
     def add_analysis(self, analysis):

@@ -15,24 +15,28 @@ class Analysis():
         self._add_info2 = add_info_2
 
     def __eq__(self, other):
-        return self.get_lemma() == other.get_lemma() and \
-            self.get_tag() == other.get_tag() and \
-            self.get_add_info_1() == other.get_add_info_1() and \
-            self.get_add_info_2() == other.get_add_info_2()
+        return self.lemma == other.lemma and \
+            self.tag == other.tag and \
+            self.add_info_1 == other.add_info_1 and \
+            self.add_info_2 == other.add_info_2
 
     def __ne__(self, other):
         return not self == other
 
-    def get_lemma(self) -> str:
+    @property
+    def lemma(self):
         return self._lemma
 
-    def get_tag(self) -> str:
+    @property
+    def tag(self):
         return self._tag
 
-    def get_add_info_1(self):
+    @property
+    def add_info_1(self):
         return self._add_info1
 
-    def get_add_info_2(self):
+    @property
+    def add_info_2(self):
         return self._add_info2
 
     @staticmethod

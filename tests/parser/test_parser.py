@@ -35,11 +35,6 @@ def double_analysis_token():
     return token
 
 
-def test_analyse_text(parser):
-    word = "tests"
-    assert parser.analyse_text(word) == Morfeusz().analyse(word)
-
-
 def test_parse_simple_analysis_word(parser, simple_analysis_token, simple_analysis_word):
     tokens = parser.parse_text(simple_analysis_word)
     assert len(tokens) == 1
@@ -51,8 +46,10 @@ def test_parse_double_analysis_word(parser, double_analysis_word, double_analysi
     assert len(tokens) == 1
     assert tokens[0] == double_analysis_token
 
+
 def test_multiple_word_analysis(parser, double_analysis_token, double_analysis_word, simple_analysis_token, simple_analysis_word):
-    tokens = parser.parse_text(double_analysis_word + ' ' + simple_analysis_word)
+    tokens = parser.parse_text(
+        double_analysis_word + ' ' + simple_analysis_word)
     assert len(tokens) == 2
     assert tokens[0] == double_analysis_token
     simple_analysis_token._range = Range(start=1, end=2)

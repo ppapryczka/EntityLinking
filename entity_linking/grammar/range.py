@@ -4,14 +4,16 @@ class Range():
         self._end = end
 
     def __eq__(self, other):
-        return self.get_start() == other.get_start() and \
-            self.get_end() == other.get_end()
+        return self.start == other.start and \
+            self.end == other.end
 
     def __ne__(self, other):
         return not self == other
 
-    def get_start(self) -> int:
+    @property
+    def start(self):
         return self._start
 
-    def get_end(self) -> int:
+    @property
+    def end(self):
         return self._end
