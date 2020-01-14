@@ -20,18 +20,38 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.6
+    - name: Install morfeusz2
+      run: |
+        wget -O - http://download.sgjp.pl/apt/sgjp.gpg.key|sudo apt-key add -
+        sudo apt-add-repository http://download.sgjp.pl/apt/ubuntu
+        sudo apt update
+        sudo apt install morfeusz2
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        python3 -m venv venv
+        source venv/bin/activate
+        pip3 install --upgrade pip
+        pip3 install -r requirements.txt
+    - name: Install python wrapper for morfeusz2
+      run: |
+        source venv/bin/activate
+        wget http://download.sgjp.pl/morfeusz/20191229/Linux/18.04/64/morfeusz2-0.4.0-py3.6-Linux-amd64.egg
+        easy_install morfeusz2-0.4.0-py3.6-Linux-amd64.egg
+      continue-on-error: true
+    - name: Remove morfeusz2 python egg
+      run: |
+        rm morfeusz2-0.4.0-py3.6-Linux-amd64.egg
     - name: Lint with flake8
       run: |
-        pip install flake8
+        source venv/bin/activate
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --exclude=venv --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings.
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+        flake8 . --exclude=venv --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
     - name: Test with pytest
       run: |
-        pip install pytest
+        source venv/bin/activate
         pytest
+    - name: Remove environment
+      run: |
+        rm -r venv
