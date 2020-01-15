@@ -1,3 +1,7 @@
+"""
+Module with tools, constants and common class declarations.
+"""
+
 from dataclasses import dataclass
 from typing import List
 
@@ -5,9 +9,9 @@ import pandas as pd
 from wikidata.entity import EntityId
 
 # test file 1 name, ATTENTION! it is too big to read full
-TEST_FILE_1: str = "../tokens-with-entities.tsv"
-# test file 2 name - with extended data, ATTENTION! it is too big to read full
-TEST_FILE_2: str = "../tokens-with-entities-and-tags.tsv"
+TEST_FILE_1: str = "tokens-with-entities.tsv"
+# test file 2 name - with extended data: lemmas and tags, ATTENTION! it is too big to read full
+TEST_FILE_2: str = "tokens-with-entities-and-tags.tsv"
 # number of full sequences to read
 SEQUENCE_NUMBER_TO_READ: int = 100000
 # target entities
@@ -67,24 +71,7 @@ TARGET_ENTITIES: List[str] = [
     # food
     "Q2095",
 ]
-# Punctuation signs to omit
-PUNCTUATION_SIGNS: List[str] = [
-    ";",
-    ",",
-    ":",
-    "-",
-    ".",
-    "!",
-    "?",
-    "(",
-    ")",
-    "-",
-    "...",
-    '"',
-    "–",
-    "/",
-]
-# sign for word not in Polish wikidata
+# sign for word not in Polish wikidata in test set
 NOT_WIKIDATA_ENTITY_SIGN: str = "_"
 # Entity Wikimedia disambiguation page, this page go to entity Q30642 and Q11862829 - this cause errors
 DISAMBIGATION_PAGE: EntityId = EntityId("Q4167410")
@@ -103,11 +90,15 @@ class ExtendedToken(Token):
     lemma: str
     morph_tags: str
 
+    def get_first_morph_tags_part(self) -> str:
+        return self.morph_tags.split(":")[0]
+
 
 @dataclass
 class TokensGroup:
     start: int
     end: int
+    token: str
 
 
 @dataclass
@@ -124,6 +115,13 @@ class TokensSequence:
         result = ""
         for i in range(start, end):
             result += self.sequence[i].token_value + " "
+
+        return result[:-1]
+
+    def get_token_as_str_from_lemma(self, start: int, end: int) -> str:
+        result = ""
+        for i in range(start, end):
+            result += self.sequence[i].lemma + " "
 
         return result[:-1]
 

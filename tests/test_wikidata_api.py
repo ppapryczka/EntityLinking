@@ -1,7 +1,7 @@
 from entity_linking.wikidata_api import (
     get_data_for_given_entity,
-    get_instance_of_for_entity,
-    get_pages_ids_for_given_token,
+    get_subclasses_for_entity_wikidata,
+    get_pages_for_token_wikidata,
     get_wikidata_link_for_entity,
     WIKIDATA_URL,
 )
@@ -30,12 +30,12 @@ def test_get_data_for_given_entity_2():
 
 
 def test_get_instance_of_for_entity():
-    data: List = get_instance_of_for_entity(EntityId(TEST_ENTITY_1))
+    data: List = get_subclasses_for_entity_wikidata(EntityId(TEST_ENTITY_1))
     assert data == ["Q2616791"]
 
 
 def test_get_pages_ids_for_given_token():
-    pages: List = get_pages_ids_for_given_token("Nowy Targ")
+    pages: List = get_pages_for_token_wikidata("Nowy Targ")
     assert pages[0] == TEST_ENTITY_1
 
 
