@@ -1,22 +1,19 @@
+"""
+Module that contain functions design to deal with entities graphs.
+"""
 from typing import List
 
 import networkx as nx
 from wikidata.entity import EntityId
 
+from entity_linking.database_api import WikidataAPI
 from entity_linking.utils import DISAMBIGATION_PAGE, TARGET_ENTITIES
-from entity_linking.wikidata_api import get_instance_of_for_entity
-
-"""
-DRAW GRAPH
-import matplotlib.pyplot as plt
-"""
-
 
 MAX_DEPTH_LEVEL = 5
 
 
 def create_graph_for_entity(
-    entity: EntityId, graph_levels: int = MAX_DEPTH_LEVEL
+    entity: EntityId, wikidata_API: WikidataAPI, graph_levels: int = MAX_DEPTH_LEVEL
 ) -> nx.Graph():
     """
     Create directed graph for given ``entity``. Nodes are entity names.
@@ -24,15 +21,14 @@ def create_graph_for_entity(
     Args:
         entity: Name of entity, in format Q{Number}.
         graph_levels: Max graph levels. Default: MAX_DEPTH_LEVEL.
-
     Returns:
         Graph for given ``entity``.
     """
 
     g = nx.DiGraph()
-    g.add_node(entity)
+    node = g.add_node(entity)
 
-    this_level_entities = [entity]
+    this_level_entities = [(entity, node)]
 
     for depth in range(graph_levels):
         next_level_entities = []
@@ -41,21 +37,16 @@ def create_graph_for_entity(
         for ent in this_level_entities:
 
             # omit DISAMBIGATION_PAGE - it cause errors
-            if ent == DISAMBIGATION_PAGE:
+            if ent[0] == DISAMBIGATION_PAGE:
                 continue
 
-            for instance_of in get_instance_of_for_entity(ent):
-                g.add_node(instance_of)
-                g.add_edge(ent, instance_of)
-                next_level_entities.append(instance_of)
+            for instance_of in wikidata_API.get_subclasses_for_entity(ent[0]):
+                target_node = g.add_node(instance_of)
+                g.add_edge(ent[0], target_node)
+                next_level_entities.append((instance_of, target_node))
 
         this_level_entities = next_level_entities
 
-    """
-    DRAW GRAPH
-    nx.draw_kamada_kawai(g, with_labels=True, font_weight='bold', )
-    plt.show()
-    """
     return g
 
 

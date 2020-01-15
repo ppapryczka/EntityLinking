@@ -1,3 +1,6 @@
+"""
+Module that contains functions that get data from wikidata website.
+"""
 from typing import Any, Dict, List
 
 import requests
@@ -110,10 +113,9 @@ def get_data_for_given_entity(entity: EntityId) -> Dict[str, Any]:
     }
 
 
-def get_instance_of_for_entity(entity: EntityId) -> List:
+def get_subclasses_for_entity_wikidata(entity: EntityId) -> List:
     """
-    Call ``get_data_for_entity`` function, get data and
-    take only instance of part.
+    Get data using Wikidata library and only instance of part.
 
     Args:
         entity: Name of entity, in format Q{Number}.
@@ -121,11 +123,37 @@ def get_instance_of_for_entity(entity: EntityId) -> List:
     Returns:
        List of "instance of" and "subclass of" for entity.
     """
-    data = get_data_for_given_entity(entity)
-    return data["instance of"]
+    # load data
+    client = Client()
+    entity = client.get(entity, load=True)
+    entity_data = entity.data
+
+    instance_of = []
+    if "claims" in entity_data:
+        # take instance of entity
+        if ID_INSTANCE_OF in entity_data["claims"]:
+            for _, obj in enumerate(entity_data["claims"][ID_INSTANCE_OF]):
+                mainsnak = obj["mainsnak"]
+                if mainsnak["snaktype"] != "novalue":
+                    instance_of.append(mainsnak["datavalue"]["value"]["id"])
+
+        # take subclass of entity
+        if ID_SUBCLASS_OF in entity_data["claims"]:
+            for _, obj in enumerate(entity_data["claims"][ID_SUBCLASS_OF]):
+                mainsnak = obj["mainsnak"]
+                if mainsnak["snaktype"] != "novalue":
+                    instance_of.append(mainsnak["datavalue"]["value"]["id"])
+
+        # take facet of
+        if ID_FACET_OF in entity_data["claims"]:
+            for _, obj in enumerate(entity_data["claims"][ID_FACET_OF]):
+                mainsnak = obj["mainsnak"]
+                if mainsnak["snaktype"] != "novalue":
+                    instance_of.append(mainsnak["datavalue"]["value"]["id"])
+    return instance_of
 
 
-def get_pages_ids_for_given_token(token: str) -> List[str]:
+def get_pages_for_token_wikidata(token: str) -> List[str]:
     """
     Get wikidata results for given ``token`` using SPARQL language.
 
@@ -172,3 +200,7 @@ def get_pages_ids_for_given_token(token: str) -> List[str]:
         entities.append(x["item"]["value"].split("/")[-1])
 
     return entities
+
+
+if __name__ == "__main__":
+    pass
