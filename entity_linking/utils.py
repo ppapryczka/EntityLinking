@@ -75,6 +75,17 @@ TARGET_ENTITIES: List[str] = [
 NOT_WIKIDATA_ENTITY_SIGN: str = "_"
 # Entity Wikimedia disambiguation page, this page go to entity Q30642 and Q11862829 - this cause errors
 DISAMBIGATION_PAGE: EntityId = EntityId("Q4167410")
+# tokens groups that occur most often
+BEST_TOKEN_GROUPS: List[List[str]] = [
+    ["subst"],
+    ["subst", "subst"],
+    ["subst", "adj"],
+    ["adj"],
+    ["adj", "subst"],
+    ["subst", "subst", "subst"],
+    ["num"],
+    ["adj", "subst", "adj"],
+]
 
 
 @dataclass
@@ -104,6 +115,20 @@ class TokensGroup:
 @dataclass
 class ExtendedTokensGroup(TokensGroup):
     pages: List[str]
+
+
+@dataclass
+class ClassificationResult:
+    result_entity: str
+    score: float
+    proba: float
+
+    def __init__(
+        self, result_entity: str, score: float = 0.0, proba: float = 0.0
+    ) -> None:
+        self.result_entity = result_entity
+        self.score = score
+        self.proba = proba
 
 
 @dataclass

@@ -6,8 +6,12 @@ from typing import Iterator, List
 
 import pandas as pd
 
-from entity_linking.utils import (NOT_WIKIDATA_ENTITY_SIGN, ExtendedToken,
-                                  Token, TokensSequence)
+from entity_linking.utils import (
+    NOT_WIKIDATA_ENTITY_SIGN,
+    ExtendedToken,
+    Token,
+    TokensSequence,
+)
 
 
 def load_sequences_from_test_file_without_tags_and_lemmas(

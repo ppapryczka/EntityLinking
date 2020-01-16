@@ -26,25 +26,22 @@ def create_graph_for_entity(
     """
 
     g = nx.DiGraph()
-    node = g.add_node(entity)
 
-    this_level_entities = [(entity, node)]
+    this_level_entities = [entity]
 
     for depth in range(graph_levels):
         next_level_entities = []
 
         # iterate over this level entities
         for ent in this_level_entities:
-
             # omit DISAMBIGATION_PAGE - it cause errors
-            if ent[0] == DISAMBIGATION_PAGE:
+            if ent == DISAMBIGATION_PAGE:
                 continue
 
-            for instance_of in wikidata_API.get_subclasses_for_entity(ent[0]):
-                target_node = g.add_node(instance_of)
-                g.add_edge(ent[0], target_node)
-                next_level_entities.append((instance_of, target_node))
-
+            for instance_of in wikidata_API.get_subclasses_for_entity(ent):
+                g.add_node(instance_of)
+                g.add_edge(ent, instance_of)
+                next_level_entities.append(instance_of)
         this_level_entities = next_level_entities
 
     return g
@@ -66,3 +63,21 @@ def check_if_target_entity_is_in_graph(g: nx.Graph) -> bool:
             return True
 
     return False
+
+
+def get_graph_score(g: nx.Graph, entity: str) -> float:
+    nodes: List = list(g.nodes)
+    results = []
+
+    for target_e in TARGET_ENTITIES:
+        if target_e in nodes:
+            score = 0.0
+            for x in nx.all_simple_paths(g, source=entity, target=target_e):
+                score += 1.0 / len(x)
+            results.append(score)
+
+    return max(results)
+
+
+def get_graph_similarity(g1: nx.Graph, g2: nx.Graph) -> float:
+    pass
