@@ -131,23 +131,30 @@ class OverlapTokensGraphEntityClassifier(EntityClassifier):
 
     def classify_sequence(self, sequence: TokensSequence) -> pd.DataFrame:
         start_time = time.time()
+
+        # tokenize
         chosen_tokens: List[TokensGroup] = self.tokenizer.tokenize(sequence)
 
-        token_results = []
+        # iterate over chosen tokens create graph and check if it
+        # contains any of target entities
+        classify_result: List[ClassificationResult] = []
+
         for token in chosen_tokens:
-            result: str = NOT_WIKIDATA_ENTITY_SIGN
+            graph_result = ClassificationResult(NOT_WIKIDATA_ENTITY_SIGN)
             for page in token.pages:
                 graph: nx.Graph = create_graph_for_entity(
                     EntityId(page), self.wikidata_API
                 )
 
                 if check_if_target_entity_is_in_graph(graph):
-                    result = page
+                    score = get_graph_score(graph, page)
+                    graph_result = ClassificationResult(page, score)
                     break
-            token_results.append(result)
+            classify_result.append(graph_result)
 
         print(f"{sequence.id} done! ", "time: ", time.time() - start_time)
-        return sequence.create_result_table(chosen_tokens, token_results)
+
+        return create_result_data_frame(sequence, chosen_tokens, classify_result)
 
     def classify_sequences_from_file(
         self, file_name: str, seq_number: int
@@ -157,10 +164,14 @@ class OverlapTokensGraphEntityClassifier(EntityClassifier):
 
             iter = get_sequences_from_file(csv_reader)
 
+            result_df = pd.DataFrame()
+
             for x in range(seq_number):
                 seq = next(iter)
-                if x > 1600:
-                    self.classify_sequence(seq)
+                result_df = result_df.append(self.classify_sequence(seq))
+
+        result_df = result_df.reset_index(drop=True)
+        return result_df
 
 
 class ContextGraphEntityClassifier(EntityClassifier):
