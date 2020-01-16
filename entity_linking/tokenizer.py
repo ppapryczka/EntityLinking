@@ -6,8 +6,12 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from entity_linking.database_api import WikidataAPI
-from entity_linking.utils import (ExtendedTokensGroup, TokensGroup,
-                                  TokensSequence)
+from entity_linking.utils import (
+    BEST_TOKEN_GROUPS,
+    ExtendedTokensGroup,
+    TokensGroup,
+    TokensSequence,
+)
 
 
 class Tokenizer(ABC):
@@ -52,11 +56,11 @@ class WikidataLengthTokenizer(Tokenizer):
         result: List[ExtendedTokensGroup] = []
         for x in range(len(sequence.sequence) - self.token_length + 1):
             if x + self.token_length < len(sequence.sequence):
-                # check pages for form in text
+
+                # check pages for token group in text
                 entities = self.wikidata_API.get_pages_for_token(
                     sequence.get_token_as_str(x, x + self.token_length),
                 )
-
                 if len(entities) > 0:
                     result.append(
                         ExtendedTokensGroup(
@@ -88,46 +92,64 @@ class WikidataLengthTokenizer(Tokenizer):
 
 
 class WikidataMorphTagsTokenizer(Tokenizer):
-    token_length: int
+    max_token_length: int
 
-    def __init__(self, token_length: int, wikidata_API: WikidataAPI):
+    def __init__(self, max_token_length: int, wikidata_API: WikidataAPI):
         super().__init__(wikidata_API)
-        self.token_length = token_length
+        self.max_token_length = max_token_length
+
+    def get_possible_tokens(self, sequence: TokensSequence) -> List:
+        possible_tokens = []
+
+        for token_l in range(1, self.max_token_length + 1):
+            for x in range(len(sequence.sequence) - self.max_token_length + 1):
+                morph_tags = [
+                    t.get_first_morph_tags_part()
+                    for t in sequence.sequence[x : x + token_l]
+                ]
+                if morph_tags in BEST_TOKEN_GROUPS:
+                    possible_tokens.append((x, x + token_l))
+
+        return possible_tokens
 
     def tokenize(self, sequence: TokensSequence) -> List[TokensGroup]:
         result: List[ExtendedTokensGroup] = []
-        for x in range(len(sequence.sequence) - self.token_length + 1):
-            if x + self.token_length < len(sequence.sequence):
-                # check pages for form in text
-                entities = self.wikidata_API.get_pages_for_token(
-                    sequence.get_token_as_str(x, x + self.token_length)
+
+        possible_tokens = self.get_possible_tokens(sequence)
+
+        for possible_token in possible_tokens:
+
+            # check pages for token group in text
+            entities = self.wikidata_API.get_pages_for_token(
+                sequence.get_token_as_str(possible_token[0], possible_token[1]),
+            )
+            if len(entities) > 0:
+                result.append(
+                    ExtendedTokensGroup(
+                        possible_token[0],
+                        possible_token[1],
+                        sequence.get_token_as_str(possible_token[0], possible_token[1]),
+                        entities,
+                    )
                 )
 
-                if len(entities) > 0:
-                    result.append(
-                        ExtendedTokensGroup(
-                            x,
-                            x + self.token_length,
-                            sequence.get_token_as_str(x, x + self.token_length),
-                            entities,
-                        )
-                    )
+            # check pages for lemma form
+            entities = self.wikidata_API.get_pages_for_token(
+                sequence.get_token_as_str_from_lemma(
+                    possible_token[0], possible_token[1]
+                ),
+            )
 
-                # check pages for lemma form
-                entities = self.wikidata_API.get_pages_for_token(
-                    sequence.get_token_as_str_from_lemma(x, x + self.token_length)
+            if len(entities) > 0:
+                result.append(
+                    ExtendedTokensGroup(
+                        possible_token[0],
+                        possible_token[1],
+                        sequence.get_token_as_str_from_lemma(
+                            possible_token[0], possible_token[1]
+                        ),
+                        entities,
+                    )
                 )
-
-                if len(entities) > 0:
-                    result.append(
-                        ExtendedTokensGroup(
-                            x,
-                            x + self.token_length,
-                            sequence.get_token_as_str_from_lemma(
-                                x, x + self.token_length
-                            ),
-                            entities,
-                        )
-                    )
 
         return result

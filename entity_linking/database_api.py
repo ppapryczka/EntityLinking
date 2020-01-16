@@ -22,13 +22,13 @@ class WikidataAPI:
 
     def get_subclasses_for_entity(self, entity: str) -> List[str]:
         if self.use_database:
-            get_subclasses_for_entity(self.database_name, entity)
+            return get_subclasses_for_entity(self.database_name, entity)
         else:
-            return get_subclasses_for_entity_wikidata(entity)
+            return get_subclasses_for_entity_wikidata(EntityId(entity))
 
     def get_pages_for_token(self, token: str) -> List[str]:
         if self.use_database:
-            get_pages_for_token(self.database_name, token)
+            return get_pages_for_token(self.database_name, token)
         else:
             return get_pages_for_token_wikidata(token)
 
@@ -176,7 +176,7 @@ def get_pages_for_token(database_name: str, token: str) -> List[str]:
     # no such token in db
     if result is None:
         pages = get_pages_for_token_wikidata(token)
-        add_token_pages_to_data_base(token, pages)
+        add_token_pages_to_data_base(database_name, token, pages)
         return pages
     # such token already in db
     else:
