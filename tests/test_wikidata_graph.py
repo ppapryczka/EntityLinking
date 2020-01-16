@@ -9,7 +9,7 @@ api = WikidataAPI(False)
 
 def test_create_graph_for_entity_zero_level():
     g: nx.Graph = create_graph_for_entity(EntityId(TEST_ENTITY_1), api, 0)
-    assert list(g.nodes()) == [TEST_ENTITY_1]
+    assert list(g.nodes()) == []
 
 
 def test_create_graph_for_entity_one_level():
