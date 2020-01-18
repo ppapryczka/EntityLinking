@@ -101,7 +101,8 @@ def load_sequences_from_test_file_with_lemmas_and_tags(
 def get_sequences_from_file(csv_reader) -> Iterator[TokensSequence]:
     """
     Load sequences from in same format as TEST_FILE_2 - with lemmas and tags.
-    File must be open before!
+    File must be open before! It is don't that way to omit opening file in
+    generator function which may cause errors.
 
     Args:
         csv_reader: CSV reader open by csv.reader.
@@ -119,7 +120,7 @@ def get_sequences_from_file(csv_reader) -> Iterator[TokensSequence]:
             yield es
             es = TokensSequence([], idx)
 
-        # row is not empty - append
+        # row is not empty - append token to sequence
         else:
             es.sequence.append(
                 ExtendedToken(

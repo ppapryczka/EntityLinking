@@ -34,7 +34,7 @@ class Tokenizer(ABC):
     @abstractmethod
     def tokenize(self, sequence: TokensSequence) -> List[TokensGroup]:
         """
-        Abstract metod to all tokenizers - from sequence create tokens.
+        Abstract method to all tokenizers - from sequence create tokens.
 
         Args:
             sequence: Sequence of tokens to tokenize.
@@ -105,7 +105,7 @@ class WikidataMorphTagsTokenizer(Tokenizer):
             for x in range(len(sequence.sequence) - self.max_token_length + 1):
                 morph_tags = [
                     t.get_first_morph_tags_part()
-                    for t in sequence.sequence[x : x + token_l]
+                    for t in sequence.sequence[x: x + token_l]
                 ]
                 if morph_tags in BEST_TOKEN_GROUPS:
                     possible_tokens.append((x, x + token_l))
