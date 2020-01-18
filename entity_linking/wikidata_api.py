@@ -1,10 +1,11 @@
 """
 Module that contains functions that get data from wikidata website.
 """
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import requests
-from wikidata.client import Client, EntityId
+from wikidata.client import Client
+from wikidata.entity import EntityId
 
 # ID of "instance of" property
 ID_INSTANCE_OF: str = "P31"
@@ -21,6 +22,7 @@ WIKIDATA_URL_SPARQL: str = "https://query.wikidata.org/sparql"
 DEFAULT_RESULTS_LIMIT: int = 5
 # user agent
 USER_AGENT: str = "EntityLinking/1.0 (https://github.com/ppapryczka/EntityLinking) Python/Wikidata/0.6.1"
+
 
 
 def get_wikidata_link_for_entity(entity: str) -> str:
@@ -200,6 +202,21 @@ def get_pages_for_token_wikidata(token: str) -> List[str]:
         entities.append(x["item"]["value"].split("/")[-1])
 
     return entities
+
+
+def get_title_in_polish_wikipedia(entity: EntityId) -> Union[None, str]:
+    # load data
+    client = Client()
+    entity = client.get(entity, load=True)
+    entity_data = entity.data
+
+    if "sitelinks" in entity_data:
+        if "plwiki" in entity_data["sitelinks"]:
+            if "url" in entity_data["sitelinks"]["plwiki"]:
+                print(entity_data["sitelinks"]["plwiki"])
+                return entity_data["sitelinks"]["plwiki"]["title"]
+
+    return None
 
 
 if __name__ == "__main__":

@@ -91,10 +91,12 @@ def create_result_data_frame(
         "test_classified",
         "result_classified",
         "correct_predict",
+        "result_token"
     ]
 
     result_df = pd.DataFrame(columns=columns)
 
+    result_token = []
     test_entity = []
     result_entity = []
     test_classified = []
@@ -110,11 +112,12 @@ def create_result_data_frame(
         else:
             test_classified.append(0)
             correct_predict.append(0)
-
         # dummy append
         result_entity.append(NOT_WIKIDATA_ENTITY_SIGN)
         # dummy append
         result_classified.append(0)
+        # dummy append
+        result_token.append(NOT_WIKIDATA_ENTITY_SIGN)
 
     tokens_and_results = list(zip(tokens_groups, tokens_groups_entity_results))
 
@@ -134,6 +137,7 @@ def create_result_data_frame(
             if empty:
                 for x in range(token.start, token.end + 1):
                     result_entity[x] = result.result_entity
+                    result_token[x] = token.token
                     result_classified[x] = 1
                     if result_entity[x] == test_entity[x]:
                         correct_predict[x] = 1
@@ -152,6 +156,7 @@ def create_result_data_frame(
             test_classified,
             result_classified,
             correct_predict,
+            result_token
         )
     )
     result_df = result_df.append(pd.DataFrame(result_list, columns=columns))
