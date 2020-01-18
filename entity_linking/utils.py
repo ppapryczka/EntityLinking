@@ -86,6 +86,8 @@ BEST_TOKEN_GROUPS: List[List[str]] = [
     ["num"],
     ["adj", "subst", "adj"],
 ]
+# default number of processes to run
+DEFAULT_PROCESSES_NUMBER: int = 8
 
 
 @dataclass

@@ -80,8 +80,9 @@ def load_sequences_from_test_file_with_lemmas_and_tags(
                 result.append(es)
                 if len(result) == seq_number:
                     break
-                es = TokensSequence([], idx)
                 idx += 1
+                es = TokensSequence([], idx)
+
             # row not empty - append token to sequence
             else:
                 es.sequence.append(

@@ -21,8 +21,9 @@ class Tokenizer(ABC):
     """
 
     wikidata_API: WikidataAPI
+    max_token_length: int
 
-    def __init__(self, wikidata_API: WikidataAPI):
+    def __init__(self, wikidata_API: WikidataAPI, max_token_length: int):
         """
         Set name of database to get pages for tokens.
 
@@ -30,6 +31,7 @@ class Tokenizer(ABC):
             wikidata_API: API to get wikidata pages.
         """
         self.wikidata_API = wikidata_API
+        self.max_token_length = max_token_length
 
     @abstractmethod
     def tokenize(self, sequence: TokensSequence) -> List[TokensGroup]:
@@ -46,43 +48,44 @@ class Tokenizer(ABC):
 
 
 class WikidataLengthTokenizer(Tokenizer):
-    token_length: int
+    max_token_length: int
 
-    def __init__(self, token_length: int, wikidata_API: WikidataAPI):
-        super().__init__(wikidata_API)
-        self.token_length = token_length
+    def __init__(
+        self, token_length: int, wikidata_API: WikidataAPI, max_token_length: int
+    ):
+        super().__init__(wikidata_API, max_token_length)
 
     def tokenize(self, sequence: TokensSequence) -> List[TokensGroup]:
         result: List[ExtendedTokensGroup] = []
-        for x in range(len(sequence.sequence) - self.token_length + 1):
-            if x + self.token_length < len(sequence.sequence):
+        for x in range(len(sequence.sequence) - self.max_token_length + 1):
+            if x + self.max_token_length < len(sequence.sequence):
 
                 # check pages for token group in text
                 entities = self.wikidata_API.get_pages_for_token(
-                    sequence.get_token_as_str(x, x + self.token_length),
+                    sequence.get_token_as_str(x, x + self.max_token_length),
                 )
                 if len(entities) > 0:
                     result.append(
                         ExtendedTokensGroup(
                             x,
-                            x + self.token_length,
-                            sequence.get_token_as_str(x, x + self.token_length),
+                            x + self.max_token_length,
+                            sequence.get_token_as_str(x, x + self.max_token_length),
                             entities,
                         )
                     )
 
                 # check pages for lemma form
                 entities = self.wikidata_API.get_pages_for_token(
-                    sequence.get_token_as_str_from_lemma(x, x + self.token_length),
+                    sequence.get_token_as_str_from_lemma(x, x + self.max_token_length),
                 )
 
                 if len(entities) > 0:
                     result.append(
                         ExtendedTokensGroup(
                             x,
-                            x + self.token_length,
+                            x + self.max_token_length,
                             sequence.get_token_as_str_from_lemma(
-                                x, x + self.token_length
+                                x, x + self.max_token_length
                             ),
                             entities,
                         )
@@ -92,11 +95,8 @@ class WikidataLengthTokenizer(Tokenizer):
 
 
 class WikidataMorphTagsTokenizer(Tokenizer):
-    max_token_length: int
-
-    def __init__(self, max_token_length: int, wikidata_API: WikidataAPI):
-        super().__init__(wikidata_API)
-        self.max_token_length = max_token_length
+    def __init__(self, wikidata_API: WikidataAPI, max_token_length: int):
+        super().__init__(wikidata_API, max_token_length)
 
     def get_possible_tokens(self, sequence: TokensSequence) -> List:
         possible_tokens = []
