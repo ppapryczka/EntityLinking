@@ -6,14 +6,12 @@ from typing import List
 import networkx as nx
 from wikidata.entity import EntityId
 
-from entity_linking.database_api import WikidataAPI
-from entity_linking.utils import DISAMBIGATION_PAGE, TARGET_ENTITIES
-
-MAX_DEPTH_LEVEL = 5
+from entity_linking.utils import DISAMBIGUATION_PAGE, MAX_DEPTH_LEVEL, TARGET_ENTITIES
+from entity_linking.wikdata_api import WikidataAPI
 
 
 def create_graph_for_entity(
-    entity: EntityId, wikidata_API: WikidataAPI, graph_levels: int = MAX_DEPTH_LEVEL
+    entity: EntityId, wikidata_api: WikidataAPI, graph_levels: int = MAX_DEPTH_LEVEL
 ) -> nx.Graph():
     """
     Create directed graph for given ``entity``. Nodes are entity names.
@@ -21,6 +19,8 @@ def create_graph_for_entity(
     Args:
         entity: Name of entity, in format Q{Number}.
         graph_levels: Max graph levels. Default: MAX_DEPTH_LEVEL.
+        wikidata_api: API to get data from wikidata.
+
     Returns:
         Graph for given ``entity``.
     """
@@ -34,11 +34,11 @@ def create_graph_for_entity(
 
         # iterate over this level entities
         for ent in this_level_entities:
-            # omit DISAMBIGATION_PAGE - it cause errors
-            if ent == DISAMBIGATION_PAGE:
+            # omit DISAMBIGUATION_PAGE - it cause errors
+            if ent == DISAMBIGUATION_PAGE:
                 continue
 
-            for instance_of in wikidata_API.get_subclasses_for_entity(ent):
+            for instance_of in wikidata_api.get_subclasses_for_entity(EntityId(ent)):
                 g.add_node(instance_of)
                 g.add_edge(ent, instance_of)
                 next_level_entities.append(instance_of)
@@ -65,7 +65,17 @@ def check_if_target_entity_is_in_graph(g: nx.Graph) -> bool:
     return False
 
 
-def get_graph_score(g: nx.Graph, entity: str) -> float:
+def get_graph_score(g: nx.Graph, entity: EntityId) -> float:
+    """
+    Score graph using information about length of path.
+
+    Args:
+        g: Graph to score.
+        entity: Entity which for was build graph.
+
+    Returns:
+        Score of ``g``.
+    """
     nodes: List = list(g.nodes)
     results = []
 
@@ -77,7 +87,3 @@ def get_graph_score(g: nx.Graph, entity: str) -> float:
             results.append(score)
 
     return max(results)
-
-
-def get_graph_similarity(g1: nx.Graph, g2: nx.Graph) -> float:
-    pass

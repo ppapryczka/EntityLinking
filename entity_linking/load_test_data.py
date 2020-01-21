@@ -6,50 +6,7 @@ from typing import Iterator, List
 
 import pandas as pd
 
-from entity_linking.utils import (
-    NOT_WIKIDATA_ENTITY_SIGN,
-    ExtendedToken,
-    Token,
-    TokensSequence,
-)
-
-
-def load_sequences_from_test_file_without_tags_and_lemmas(
-    file_name: str, seq_number: int,
-) -> List[TokensSequence]:
-    """
-    Load sequences from ``file``. Words in this file can't have tags and lemmas.
-
-    Args:
-        file_name: Name of input file.
-        seq_number: Number of sequences to read from file.
-
-    Returns:
-        List of sequences, that contain Token class list.
-    """
-    # take only first sequences_number sequences
-    result: List[TokensSequence] = []
-    idx: int = 0
-
-    with open(file_name) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter="\t")
-
-        es: TokensSequence = TokensSequence([], 0)
-        for cur_row in csv_reader:
-            # row is empty - next sentence
-            if not cur_row:
-                result.append(es)
-                if len(result) == seq_number:
-                    break
-                es = TokensSequence([], idx)
-                idx += 1
-            # row not empty - append token to sequence
-            else:
-                es.sequence.append(
-                    Token(cur_row[1], cur_row[2], cur_row[3], cur_row[4])
-                )
-
-    return result
+from entity_linking.utils import NOT_WIKIDATA_ENTITY_SIGN, Token, TokensSequence
 
 
 def load_sequences_from_test_file_with_lemmas_and_tags(
@@ -86,7 +43,7 @@ def load_sequences_from_test_file_with_lemmas_and_tags(
             # row not empty - append token to sequence
             else:
                 es.sequence.append(
-                    ExtendedToken(
+                    Token(
                         cur_row[1],
                         cur_row[3],
                         cur_row[5],
@@ -124,7 +81,7 @@ def get_sequences_from_file(csv_reader) -> Iterator[TokensSequence]:
         # row is not empty - append token to sequence
         else:
             es.sequence.append(
-                ExtendedToken(
+                Token(
                     cur_row[1],
                     cur_row[3],
                     cur_row[5],
@@ -139,8 +96,9 @@ def get_entities_from_test_file_and_save(
     test_file_name: str, result_file_name: str, sequences_number: int
 ) -> None:
     """"
-    Load sequences from test_file_name using ``get_sequences_from_file`` and take tokens groups that with same
-    result entity. Save it first part morph tags to ``result_file_name``.
+    Function create to count stats. Load sequences from test_file_name using ``get_sequences_from_file``
+    and take tokens groups that with same result entity. Save it first part morph tags to ``result_file_name``as a csv.
+
 
     Args:
         test_file_name: File with test sequences - it must contain tags and lemmas.

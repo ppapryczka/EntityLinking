@@ -1,19 +1,17 @@
 """
 Module with tools, constants and common class declarations.
 """
-
+import argparse
+import os
 from dataclasses import dataclass
 from typing import List
 
-import pandas as pd
+import morfeusz2
 from wikidata.entity import EntityId
 
-# test file 1 name, ATTENTION! it is too big to read full
-TEST_FILE_1: str = "tokens-with-entities.tsv"
 # test file 2 name - with extended data: lemmas and tags, ATTENTION! it is too big to read full
 TEST_FILE_2: str = "tokens-with-entities-and-tags.tsv"
-# number of full sequences to read
-SEQUENCE_NUMBER_TO_READ: int = 100000
+
 # target entities
 TARGET_ENTITIES: List[str] = [
     # human
@@ -71,10 +69,13 @@ TARGET_ENTITIES: List[str] = [
     # food
     "Q2095",
 ]
+
 # sign for word not in Polish wikidata in test set
 NOT_WIKIDATA_ENTITY_SIGN: str = "_"
+
 # Entity Wikimedia disambiguation page, this page go to entity Q30642 and Q11862829 - this cause errors
-DISAMBIGATION_PAGE: EntityId = EntityId("Q4167410")
+DISAMBIGUATION_PAGE: EntityId = EntityId("Q4167410")
+
 # tokens groups that occur most often
 BEST_TOKEN_GROUPS: List[List[str]] = [
     ["subst"],
@@ -86,131 +87,182 @@ BEST_TOKEN_GROUPS: List[List[str]] = [
     ["num"],
     ["adj", "subst", "adj"],
 ]
+
 # default number of processes to run
 DEFAULT_PROCESSES_NUMBER: int = 8
+# default score threshold for WikipediaContextGraphEntityClassifier
+WIKIPEDIA_SIMILARITY_THRESHOLD: float = 0.2
+
+
+# default graph levels
+MAX_DEPTH_LEVEL: int = 5
+
+# ID of "instance of" property
+ID_INSTANCE_OF: str = "P31"
+# ID of "subclass of" property
+ID_SUBCLASS_OF: str = "P279"
+# ID of facet of
+ID_FACET_OF: str = "P1269"
+
+# address of wikidata
+WIKIDATA_URL: str = "https://www.wikidata.org/wiki/"
+# address of wikidata sparql API
+WIKIDATA_URL_SPARQL: str = "https://query.wikidata.org/sparql"
+# default max results
+DEFAULT_RESULTS_LIMIT: int = 5
+# user agent
+USER_AGENT: str = "EntityLinking/1.0 (https://github.com/ppapryczka/EntityLinking) Python/Wikidata/0.6.1"
+
+# it is important that it must be global object! It cause strange memory leak!
+MORFEUSZ: morfeusz2.Morfeusz = morfeusz2.Morfeusz()
+# max length of content from wikipedia site.
+MAX_WIKIPEDIA_PAGE_CONTENT_LEN: int = 1000
+
+
+def parser_check_if_file_exists(parser: argparse.ArgumentParser, file_path: str) -> str:
+    """
+    Check if file exists - if not call parser.error, else return ``file_path``
+    as a result.
+
+    Args:
+        parser: Command parser.
+        file_path: Path to file.
+    """
+    if os.path.isfile(file_path):
+        return file_path
+    else:
+        parser.error(f"The file {file_path} doesn't exist!")
 
 
 @dataclass
 class Token:
+    """
+    Token - description of single word to classification.
+
+    Attributes:
+        token_value: Word in original form.
+        preceding_token: 1 - token was preceded by a blank character, 0 - otherwise
+        link_title: title of the Wikidata article
+        entity_id: ID of the entity in Wikidata
+        lemma: Lemma of ``token_value``
+        morph_tags: Morphological tags of ``token_value``.
+    """
+
     token_value: str
     preceding_token: int
     link_title: str
     entity_id: str
-
-
-@dataclass
-class ExtendedToken(Token):
     lemma: str
     morph_tags: str
 
     def get_first_morph_tags_part(self) -> str:
+        """
+        Get first, most significant part of token produced
+        by Morfeusz.
+
+        Returns:
+            First morphological tag as str.
+        """
         return self.morph_tags.split(":")[0]
 
 
 @dataclass
 class TokensGroup:
+    """
+    Group of tokens from sequence chosen to classification.
+
+    Attributes:
+        start: ID of start token from sequence.
+        end: ID of end token from sequence.
+        token: Value to classification.
+        pages: IDs of pages from wikidata for this tokens group.
+    """
+
     start: int
     end: int
     token: str
-
-
-@dataclass
-class ExtendedTokensGroup(TokensGroup):
     pages: List[str]
 
 
 @dataclass
 class ClassificationResult:
+    """
+    Description of classification result for TokensGroup.
+
+    Attributes:
+        result_entity: Result wikidata ID of token.
+        score: Score of classification.
+    """
+
     result_entity: str
     score: float
-    proba: float
 
-    def __init__(
-        self, result_entity: str, score: float = 0.0, proba: float = 0.0
-    ) -> None:
+    def __init__(self, result_entity: str, score: float = 0.0) -> None:
+        """
+        Set class attributes.
+
+        Args:
+            result_entity: Result wikidata ID of token.
+            score: Score of classification.
+        """
         self.result_entity = result_entity
         self.score = score
-        self.proba = proba
 
 
 @dataclass
 class TokensSequence:
+    """
+    Sequence build from Token objects.
+
+    Attributes.
+        sequence: List of tokens.
+        id: ID of sequence, useful to identification and progress reporting.
+    """
+
     sequence: List[Token]
     id: int
 
-    def get_token_as_str(self, start: int, end: int) -> str:
+    def get_token_str_original_form(self, start: int, end: int) -> str:
+        """
+        Take ``start`` and ``end`` and return string representation of
+        such range from original form.
+
+        Args:
+            start: Start of token group.
+            end: End of token group.
+
+        Returns:
+            Token as string from its original form.
+        """
         result = ""
         for i in range(start, end):
             result += self.sequence[i].token_value + " "
 
         return result[:-1]
 
-    def get_token_as_str_from_lemma(self, start: int, end: int) -> str:
+    def get_token_str_lemma_form(self, start: int, end: int) -> str:
+        """
+        Take ``start`` and ``end`` and return string representation of
+        such range from original form.
+
+        Args:
+            start: Start of token group.
+            end: End of token group.
+
+        Returns:
+            Token as string from its original form.
+        """
         result = ""
         for i in range(start, end):
             result += self.sequence[i].lemma + " "
 
         return result[:-1]
 
-    def create_result_table(
-        self, tokens: List[TokensGroup], results: List[str]
-    ) -> pd.DataFrame:
-        result_df = pd.DataFrame(columns=["original", "prediction"],)
+    def append(self, token: Token) -> None:
+        """
+        Add ``token`` to sequence list.
 
-        assert len(tokens) == len(results)
-
-        if len(tokens) > 0:
-            cur_index: int = 0
-
-            for t_idx, t in enumerate(tokens):
-                while cur_index < t.start:
-                    ground_truth = self.sequence[cur_index].entity_id != "_"
-                    if ground_truth:
-                        ground_truth = 1
-                    else:
-                        ground_truth = 0
-
-                    result_df = result_df.append(
-                        pd.DataFrame(
-                            [[ground_truth, 0]], columns=["original", "prediction"]
-                        )
-                    )
-                    cur_index = cur_index + 1
-
-                while cur_index < t.end:
-                    ground_truth = self.sequence[cur_index].entity_id != "_"
-                    if ground_truth:
-                        ground_truth = 1
-                    else:
-                        ground_truth = 0
-
-                    prediction = results[t_idx] != "_"
-                    if prediction:
-                        prediction = 1
-                    else:
-                        prediction = 0
-
-                    result_df = result_df.append(
-                        pd.DataFrame(
-                            [[ground_truth, prediction]],
-                            columns=["original", "prediction"],
-                        )
-                    )
-                    cur_index = cur_index + 1
-
-            while cur_index < len(self.sequence):
-                ground_truth = self.sequence[cur_index].entity_id != "_"
-
-                if ground_truth:
-                    ground_truth = 1
-                else:
-                    ground_truth = 0
-
-                result_df = result_df.append(
-                    pd.DataFrame(
-                        [[ground_truth, 0]], columns=["original", "prediction"],
-                    )
-                )
-                cur_index = cur_index + 1
-
-        return result_df.reset_index(drop=True)
+        Args:
+            token: Token to add.
+        """
+        self.sequence.append(token)

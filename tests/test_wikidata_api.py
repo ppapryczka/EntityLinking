@@ -1,4 +1,4 @@
-from entity_linking.wikidata_api import (
+from entity_linking.wikidata_web_api import (
     get_data_for_given_entity,
     get_subclasses_for_entity_wikidata,
     get_pages_for_token_wikidata,

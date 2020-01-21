@@ -1,6 +1,6 @@
 """
-Module that contain API to sqlite3 database. It is use to make Wikidata requests more efficient saving results
-to future use.
+Module that contains wikidata API build around sqlite3 database. It is use to make Wikidata requests more efficient by
+saving results to future use.
 """
 
 import sqlite3
@@ -8,63 +8,10 @@ from typing import List
 
 from wikidata.entity import EntityId
 
-from entity_linking.wikidata_api import (get_pages_for_token_wikidata,
-                                         get_subclasses_for_entity_wikidata)
-
-
-class WikidataAPI:
-    use_database: bool
-    database_name: str
-
-    def __init__(self, use_database: bool, database_name: str = ""):
-        self.use_database = use_database
-        self.database_name = database_name
-
-    def get_subclasses_for_entity(self, entity: str) -> List[str]:
-        if self.use_database:
-            return get_subclasses_for_entity(self.database_name, entity)
-        else:
-            return get_subclasses_for_entity_wikidata(EntityId(entity))
-
-    def get_pages_for_token(self, token: str) -> List[str]:
-        if self.use_database:
-            return get_pages_for_token(self.database_name, token)
-        else:
-            return get_pages_for_token_wikidata(token)
-
-
-def drop_and_create_database(database_name: str) -> None:
-    """
-    Create SQLite3 data base with two tables:
-    entity: id text, sub text
-    token: id text, pages text
-
-    Entity describes subclasses of entity given by id.
-    Token describes pages for given token from Wikidata.
-    Token pages and entity sub are save in format:
-    Q{NUM};...Q{NUM}.
-
-    Args:
-        database_name: Path to new database.
-    """
-    conn = sqlite3.connect(database_name)
-
-    c = conn.cursor()
-
-    # drop table entity
-    c.execute("""DROP TABLE IF EXISTS entity""")
-
-    # drop table token
-    c.execute("""DROP TABLE IF EXISTS token""")
-
-    # create table entity
-    c.execute("""CREATE TABLE entity (id text, sub text)""")
-
-    # create table token
-    c.execute("""CREATE TABLE token (id text, pages text)""")
-
-    conn.commit()
-    conn.close()
+from entity_linking.wikidata_web_api import (
+    get_pages_for_token_wikidata,
+    get_subclasses_for_entity_wikidata,
+)
 
 
 def add_entity_subclasses_to_data_base(
@@ -92,7 +39,7 @@ def add_entity_subclasses_to_data_base(
     conn.close()
 
 
-def get_subclasses_for_entity(database_name: str, entity: str) -> List[str]:
+def get_subclasses_for_entity_db(database_name: str, entity: str) -> List[str]:
     """
     Check if database is entry for given entity. If so take subclasses from database, if not
     take subclasses from Wikidata additionally adding new entry to database.
@@ -148,7 +95,7 @@ def add_token_pages_to_data_base(
     conn.close()
 
 
-def get_pages_for_token(database_name: str, token: str) -> List[str]:
+def get_pages_for_token_db(database_name: str, token: str) -> List[str]:
     """
     Check if database is entry for given token. If so take pages from database, if not
     take search for pages in Wikidata additionally adding new entry to database.

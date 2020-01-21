@@ -75,6 +75,7 @@ def create_result_data_frame(
         test_classified - ground truth - 0 or 1 if test_entity not empty
         result_classified - result - 0 or 1 if result_entity not empty
         correct_predict - true correct predict - test_entity == result_entity and result_classified
+        score - score classification
 
     Args:
         sequence: Sequence of tokens.
@@ -91,7 +92,8 @@ def create_result_data_frame(
         "test_classified",
         "result_classified",
         "correct_predict",
-        "result_token"
+        "result_token",
+        "score",
     ]
 
     result_df = pd.DataFrame(columns=columns)
@@ -102,6 +104,7 @@ def create_result_data_frame(
     test_classified = []
     result_classified = []
     correct_predict = []
+    score = []
 
     for token in sequence.sequence:
         test_entity.append(token.entity_id)
@@ -118,6 +121,8 @@ def create_result_data_frame(
         result_classified.append(0)
         # dummy append
         result_token.append(NOT_WIKIDATA_ENTITY_SIGN)
+        # dummy append
+        score.append(0.0)
 
     tokens_and_results = list(zip(tokens_groups, tokens_groups_entity_results))
 
@@ -139,6 +144,7 @@ def create_result_data_frame(
                     result_entity[x] = result.result_entity
                     result_token[x] = token.token
                     result_classified[x] = 1
+                    score[x] = result.score
                     if result_entity[x] == test_entity[x]:
                         correct_predict[x] = 1
                     elif (
@@ -156,9 +162,11 @@ def create_result_data_frame(
             test_classified,
             result_classified,
             correct_predict,
-            result_token
+            result_token,
+            score,
         )
     )
+
     result_df = result_df.append(pd.DataFrame(result_list, columns=columns))
 
     return result_df

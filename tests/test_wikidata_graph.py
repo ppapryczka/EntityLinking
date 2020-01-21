@@ -1,10 +1,10 @@
 import networkx as nx
-from entity_linking.wikidata_graph import create_graph_for_entity, check_if_target_entity_is_in_graph
+from entity_linking.graph_wikidata import create_graph_for_entity, check_if_target_entity_is_in_graph
 from .test_utils import TEST_ENTITY_1, TEST_ENTITY_2, TEST_ENTITY_3
 from wikidata.entity import EntityId
-from entity_linking.database_api import WikidataAPI
+from entity_linking.wikidata_api import WikidataWebAPI
 
-api = WikidataAPI(False)
+api = WikidataWebAPI()
 
 
 def test_create_graph_for_entity_zero_level():
