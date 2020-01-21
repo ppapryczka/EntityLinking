@@ -13,9 +13,12 @@ def get_args_parser() -> ArgumentParser:
     #                     type=int,
     #                     help="App mode:0(train), 1(test), 2(run)")
     #
-    # parser.add_argument('-i', '--input', required=True, type=str,
-    #                     help="Input file")
-    #
+    parser.add_argument('-r', '--host', required=False, type=str,
+                        help="Database & Redis host", default="localhost")
+
+    parser.add_argument('-i', '--input', required=True, type=str,
+                        help="Input file")
+
     # parser.add_argument('-o', '--output', required=True, type=str,
     #                     help="Output file")
 
@@ -25,19 +28,17 @@ def get_args_parser() -> ArgumentParser:
 
 
 def main():
-    logger = get_logger("app")
     parser = get_args_parser()
     args = parser.parse_args()
     # mode = args.mode
-    # input_file = args.input
+    host = args.host
+    input_file = args.input
     # output_file = args.output
     # logger.info("Mode: {}, input file: {}, output file: {}".format(
     #     mode, input_file, output_file))
 
-    data_processor = DataProcessor()
-    data_processor.store_token("Krzysztof Krawczyk")
-    entity = GraphBuilder._get_entity_node(entity_id="Q1380592")
-    logger.info("Krzysztof Krawczyk (Q1380592) qualified: {}".format(entity.qualified))
+    data_processor = DataProcessor(host=host)
+    data_processor.process_file(filename=input_file)
 
 
 if __name__ == "__main__":
