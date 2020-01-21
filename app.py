@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 from entity_linking.maintenance.logger import get_logger
-from entity_linking.wiki.graph import GraphBuilder
+from entity_linking.wiki.data_processor import DataProcessor
 
 
 def get_args_parser() -> ArgumentParser:
@@ -33,8 +33,8 @@ def main():
     # logger.info("Mode: {}, input file: {}, output file: {}".format(
     #     mode, input_file, output_file))
 
-    graph_builder = GraphBuilder()
-    graph_builder.build_and_save_graph("Q1380592")
+    data_processor = DataProcessor()
+    data_processor.store_token("Krzysztof Krawczyk")
 
 
 if __name__ == "__main__":
