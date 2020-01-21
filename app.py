@@ -2,6 +2,7 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 from entity_linking.maintenance.logger import get_logger
 from entity_linking.wiki.data_processor import DataProcessor
+from entity_linking.wiki.graph import GraphBuilder
 
 
 def get_args_parser() -> ArgumentParser:
@@ -35,6 +36,8 @@ def main():
 
     data_processor = DataProcessor()
     data_processor.store_token("Krzysztof Krawczyk")
+    entity = GraphBuilder._get_entity_node(entity_id="Q1380592")
+    logger.info("Krzysztof Krawczyk (Q1380592) qualified: {}".format(entity.qualified))
 
 
 if __name__ == "__main__":
