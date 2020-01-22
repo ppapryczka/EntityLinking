@@ -142,7 +142,11 @@ class GraphBuilder:
         if self._entity_node_exists(entity_id):
             return self._get_entity_node(entity_id)
 
-        entity: Entity = self.fetch_entity_data(entity_id=entity_id)
+        try:
+            entity: Entity = self.fetch_entity_data(entity_id=entity_id)
+        except Exception as e:
+            logger.error("Failed to fetch Wikidata for: {}, error: {}".format(entity_id, e))
+            return None
 
         entity_node = self._save_node(entity=entity)
         entity_node.qualified = self._is_target_entity(entity_id)
