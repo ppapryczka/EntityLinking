@@ -7,15 +7,9 @@ import requests
 from wikidata.client import Client
 from wikidata.entity import EntityId
 
-from entity_linking.utils import (
-    ID_FACET_OF,
-    ID_INSTANCE_OF,
-    ID_SUBCLASS_OF,
-    USER_AGENT,
-    WIKIDATA_URL,
-    WIKIDATA_URL_SPARQL,
-    DEFAULT_RESULTS_LIMIT
-)
+from entity_linking.utils import (DEFAULT_RESULTS_LIMIT, ID_FACET_OF,
+                                  ID_INSTANCE_OF, ID_SUBCLASS_OF, USER_AGENT,
+                                  WIKIDATA_URL, WIKIDATA_URL_SPARQL)
 
 
 def get_wikidata_link_for_entity(entity: str) -> str:

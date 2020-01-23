@@ -91,7 +91,7 @@ BEST_TOKEN_GROUPS: List[List[str]] = [
 # default number of processes to run
 DEFAULT_PROCESSES_NUMBER: int = 8
 # default score threshold for WikipediaContextGraphEntityClassifier
-WIKIPEDIA_SIMILARITY_THRESHOLD: float = 0.2
+WIKIPEDIA_SIMILARITY_THRESHOLD: float = 0.1
 
 
 # default graph levels

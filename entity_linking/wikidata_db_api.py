@@ -9,9 +9,7 @@ from typing import List
 from wikidata.entity import EntityId
 
 from entity_linking.wikidata_web_api import (
-    get_pages_for_token_wikidata,
-    get_subclasses_for_entity_wikidata,
-)
+    get_pages_for_token_wikidata, get_subclasses_for_entity_wikidata)
 
 
 def add_entity_subclasses_to_data_base(

@@ -7,14 +7,10 @@ from typing import List
 
 from wikidata.entity import EntityId
 
-from entity_linking.wikidata_db_api import (
-    get_pages_for_token_db,
-    get_subclasses_for_entity_db,
-)
+from entity_linking.wikidata_db_api import (get_pages_for_token_db,
+                                            get_subclasses_for_entity_db)
 from entity_linking.wikidata_web_api import (
-    get_pages_for_token_wikidata,
-    get_subclasses_for_entity_wikidata,
-)
+    get_pages_for_token_wikidata, get_subclasses_for_entity_wikidata)
 
 
 class WikidataAPI(ABC):

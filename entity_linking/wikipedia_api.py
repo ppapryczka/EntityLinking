@@ -7,15 +7,10 @@ See: https://pypi.org/project/Wikipedia-API/
 import wikipediaapi
 from wikidata.entity import EntityId
 
-from entity_linking.utils import (
-    MAX_WIKIPEDIA_PAGE_CONTENT_LEN,
-    MORFEUSZ,
-    TokensSequence,
-)
-from entity_linking.wikidata_web_api import (
-    get_title_in_polish_wikipedia,
-    get_url_to_polish_wikipedia,
-)
+from entity_linking.utils import (MAX_WIKIPEDIA_PAGE_CONTENT_LEN, MORFEUSZ,
+                                  TokensSequence)
+from entity_linking.wikidata_web_api import (get_title_in_polish_wikipedia,
+                                             get_url_to_polish_wikipedia)
 
 
 def get_context_similarity_from_wikipedia(

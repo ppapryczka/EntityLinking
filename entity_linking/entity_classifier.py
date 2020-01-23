@@ -12,25 +12,19 @@ import pandas as pd
 from wikidata.entity import EntityId
 
 from entity_linking.classification_report import create_result_data_frame
-from entity_linking.graph_wikidata import (
-    MAX_DEPTH_LEVEL,
-    check_if_target_entity_is_in_graph,
-    create_graph_for_entity,
-    get_graph_score,
-)
-from entity_linking.load_test_data import (
-    load_sequences_from_test_file_with_lemmas_and_tags,
-)
+from entity_linking.graph_wikidata import (MAX_DEPTH_LEVEL,
+                                           check_if_target_entity_is_in_graph,
+                                           create_graph_for_entity,
+                                           get_graph_score)
+from entity_linking.load_test_data import \
+    load_sequences_from_test_file_with_lemmas_and_tags
 from entity_linking.tokenizer import Tokenizer
-from entity_linking.utils import (
-    DEFAULT_PROCESSES_NUMBER,
-    NOT_WIKIDATA_ENTITY_SIGN,
-    WIKIPEDIA_SIMILARITY_THRESHOLD,
-    ClassificationResult,
-    TokensGroup,
-    TokensSequence,
-)
-from entity_linking.wikdata_api import WikidataAPI
+from entity_linking.utils import (DEFAULT_PROCESSES_NUMBER,
+                                  NOT_WIKIDATA_ENTITY_SIGN,
+                                  WIKIPEDIA_SIMILARITY_THRESHOLD,
+                                  ClassificationResult, TokensGroup,
+                                  TokensSequence)
+from entity_linking.wikidata_api import WikidataAPI
 from entity_linking.wikipedia_api import get_context_similarity_from_wikipedia
 
 
@@ -250,9 +244,6 @@ class WikipediaContextGraphEntityClassifier(EntityClassifier):
                         sequence, EntityId(page)
                     )
                     graph_results.append(ClassificationResult(page, score))
-
-                    if score > self.score_threshold:
-                        break
 
             graph_results.sort(reverse=True, key=sort_fun)
 

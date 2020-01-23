@@ -14,12 +14,9 @@ import pandas as pd
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
-from entity_linking.utils import (
-    NOT_WIKIDATA_ENTITY_SIGN,
-    ClassificationResult,
-    TokensGroup,
-    TokensSequence,
-)
+from entity_linking.utils import (NOT_WIKIDATA_ENTITY_SIGN,
+                                  ClassificationResult, TokensGroup,
+                                  TokensSequence)
 
 # length of random string added to report dir end
 REPORT_RANDOM_NAME_LEN: int = 8

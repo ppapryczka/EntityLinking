@@ -2,11 +2,11 @@ from typing import Union
 
 from entity_linking.classification_report import create_report_for_result
 from entity_linking.entity_classifier import (
-    ContextGraphEntityClassifier,
-    MultiProcessGraphEntityClassifier,
-)
-from entity_linking.tokenizer import WikidataLengthTokenizer, WikidataMorphTagsTokenizer
-from entity_linking.wikdata_api import WikidataAPI, WikidataDBAPI, WikidataWebAPI
+    NoContextGraphEntityClassifier, WikipediaContextGraphEntityClassifier)
+from entity_linking.tokenizer import (WikidataLengthTokenizer,
+                                      WikidataMorphTagsTokenizer)
+from entity_linking.wikidata_api import (WikidataAPI, WikidataDBAPI,
+                                         WikidataWebAPI)
 
 
 def run_classification(
@@ -44,12 +44,12 @@ if __name__ == "__main__":
     data_base_name: str = "./entity_linking.db"
 
     run_classification(
-        WikidataMorphTagsTokenizer,
+        WikidataLengthTokenizer,
         2,
-        ContextGraphEntityClassifier,
-        4,
+        WikipediaContextGraphEntityClassifier,
+        5,
         10,
-        3000,
+        1000,
         test_file_name,
         data_base_name,
     )

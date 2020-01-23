@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from entity_linking.utils import BEST_TOKEN_GROUPS, TokensGroup, TokensSequence
-from entity_linking.wikdata_api import WikidataAPI
+from entity_linking.wikidata_api import WikidataAPI
 
 
 class Tokenizer(ABC):
@@ -140,7 +140,7 @@ class WikidataMorphTagsTokenizer(Tokenizer):
             for x in range(len(sequence.sequence) - self.max_token_length + 1):
                 morph_tags = [
                     t.get_first_morph_tags_part()
-                    for t in sequence.sequence[x: x + token_l]
+                    for t in sequence.sequence[x : x + token_l]
                 ]
                 if morph_tags in BEST_TOKEN_GROUPS:
                     possible_tokens.append((x, x + token_l))

@@ -6,8 +6,9 @@ from typing import List
 import networkx as nx
 from wikidata.entity import EntityId
 
-from entity_linking.utils import DISAMBIGUATION_PAGE, MAX_DEPTH_LEVEL, TARGET_ENTITIES
-from entity_linking.wikdata_api import WikidataAPI
+from entity_linking.utils import (DISAMBIGUATION_PAGE, MAX_DEPTH_LEVEL,
+                                  TARGET_ENTITIES)
+from entity_linking.wikidata_api import WikidataAPI
 
 
 def create_graph_for_entity(
