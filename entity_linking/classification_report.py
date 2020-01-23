@@ -236,6 +236,8 @@ def create_report_for_result(
         c_m2, "Classification same entities", dir_name, REPORT_CONFUSION_MATRIX_2
     )
 
+    print(f"Classification report save to {dir_name}.")
+
 
 def save_confusion_matrix_to_dir(
     c_matrix: np.array, plot_title: str, dir_name: str, file_name: str

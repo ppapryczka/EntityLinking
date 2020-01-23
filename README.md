@@ -31,4 +31,6 @@ Do stworzenia środowiska potrzebne są:
 - wykonaj komendę `pytest` w katalogu projektu
 
 #### Uruchomienie aplikacji
-- `python3 app.py`
+- `python3 app.py test -h`(wyświetlenie komunikatu z pomocą)
+- `python3 app.py test -i test_tags.csv -N 10 -db entity_linking/entity_linking.db`(uruchomienie aplikacji ze zbiorem testowym i utworzoną bazą danych)
+- `python3 entity_linking/create_db <database name>`(utworzenie bazy danych) 

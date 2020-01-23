@@ -107,7 +107,7 @@ ID_FACET_OF: str = "P1269"
 # address of wikidata
 WIKIDATA_URL: str = "https://www.wikidata.org/wiki/"
 # address of wikidata sparql API
-WIKIDATA_URL_SPARQL: str = "https://query.wikidata.org/sparql"
+WIKIDATA_URL_SPARQL: str = 'https://query.wikidata.org/sparql'
 # default max results
 DEFAULT_RESULTS_LIMIT: int = 5
 # user agent
@@ -128,7 +128,7 @@ def parser_check_if_file_exists(parser: argparse.ArgumentParser, file_path: str)
         parser: Command parser.
         file_path: Path to file.
     """
-    if os.path.isfile(file_path):
+    if not os.path.isfile(file_path):
         return file_path
     else:
         parser.error(f"The file {file_path} doesn't exist!")
